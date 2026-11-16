@@ -29,6 +29,7 @@ return [
     'kpi_buy' => 'Buy orders, value left',
     'kpi_undercut' => 'Undercut',
     'kpi_orders' => 'Open orders',
+    'kpi_all' => 'all orders: :value',
     'of' => ':count of :total',
 
     'sell_orders' => 'Sell Orders',

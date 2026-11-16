@@ -373,27 +373,39 @@
         return card;
       }
 
+      // Figures for what is on screen: the chosen characters, view, location, search and undercut filter.
+      // When filters hide orders, each tile also shows the figure for all orders of the chosen characters.
       function kpis() {
-        var sell = 0, buy = 0, bad = 0;
-        state.rows.forEach(function (r) {
-          if (r.side === 'sell') sell += r.value; else buy += r.value;
-          if (r.status === 'undercut') bad++;
-        });
+        var shown = (state.view !== 'buy' ? visible('sell') : []).concat(state.view !== 'sell' ? visible('buy') : []);
+        var sum = function (rows) {
+          var s = { sell: 0, buy: 0, bad: 0, count: rows.length };
+          rows.forEach(function (r) {
+            if (r.side === 'sell') s.sell += r.value; else s.buy += r.value;
+            if (r.status === 'undercut') s.bad++;
+          });
+          return s;
+        };
+        var now = sum(shown), all = sum(state.rows), filtered = shown.length !== state.rows.length;
         var isk = function (v) {
           if (v >= 1e9) return (v / 1e9).toFixed(2) + ' B ISK';
           if (v >= 1e6) return (v / 1e6).toFixed(1) + ' M ISK';
           return Math.round(v).toLocaleString() + ' ISK';
         };
         var box = $('#mo-kpis').empty();
-        [[t.kpi_sell, isk(sell)], [t.kpi_buy, isk(buy)], [t.kpi_undercut, tr('of', { count: bad, total: state.rows.length }), bad > 0], [t.kpi_orders, String(state.rows.length)]]
-          .forEach(function (k) {
-            var col = $('<div class="col-6 col-lg-3">');
-            var card = $('<div class="info-box">');
-            var content = $('<div class="info-box-content">');
-            content.append($('<span class="info-box-text">').text(k[0]));
-            content.append($('<span class="info-box-number">').toggleClass('text-danger', !!k[2]).text(k[1]));
-            box.append(col.append(card.append(content)));
-          });
+        [
+          [t.kpi_sell, isk(now.sell), false, isk(all.sell)],
+          [t.kpi_buy, isk(now.buy), false, isk(all.buy)],
+          [t.kpi_undercut, tr('of', { count: now.bad, total: now.count }), now.bad > 0, tr('of', { count: all.bad, total: all.count })],
+          [t.kpi_orders, String(now.count), false, String(all.count)]
+        ].forEach(function (k) {
+          var col = $('<div class="col-6 col-lg-3">');
+          var card = $('<div class="info-box">');
+          var content = $('<div class="info-box-content">');
+          content.append($('<span class="info-box-text">').text(k[0]));
+          content.append($('<span class="info-box-number">').toggleClass('text-danger', !!k[2]).text(k[1]));
+          if (filtered) content.append($('<small class="text-muted">').text(tr('kpi_all', { value: k[3] })));
+          box.append(col.append(card.append(content)));
+        });
       }
 
       function render() {
