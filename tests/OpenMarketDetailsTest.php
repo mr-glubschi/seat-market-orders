@@ -4,15 +4,12 @@ namespace Glubschi\Seat\MarketOrders\Tests;
 
 use Glubschi\Seat\MarketOrders\Jobs\OpenMarketDetails;
 use Seat\Eveapi\Models\RefreshToken;
-use Seat\Services\Contracts\EsiClient;
 
 /** The job must call ESI's open window route exactly as CCP documents it. */
 class OpenMarketDetailsTest extends TestCase
 {
     private function job(int $typeId): OpenMarketDetails
     {
-        // SeAT's ESI client is bound by SeAT's own providers, which these tests do not boot.
-        $this->app->instance(EsiClient::class, \Mockery::mock(EsiClient::class));
 
         $token = new RefreshToken();
         $token->character_id = 314354929;
