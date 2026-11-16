@@ -1,0 +1,48 @@
+{
+    "name": "mr-glubschi/seat-market-orders",
+    "description": "SeAT plugin: your characters' sell and buy orders next to the best competing price, with one click to the market window in the game.",
+    "type": "seat-plugin",
+    "keywords": [
+        "seat",
+        "eve-online",
+        "market",
+        "orders"
+    ],
+    "license": "GPL-2.0-or-later",
+    "homepage": "https://github.com/mr-glubschi/seat-market-orders",
+    "require": {
+        "php": "^8.2",
+        "eveseat/services": "^5.0",
+        "eveseat/eveapi": "^5.0",
+        "eveseat/web": "^5.0"
+    },
+    "require-dev": {
+        "orchestra/testbench": "^8.0",
+        "phpunit/phpunit": "^10.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Glubschi\\Seat\\MarketOrders\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Glubschi\\Seat\\MarketOrders\\Tests\\": "tests/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Glubschi\\Seat\\MarketOrders\\MarketOrdersServiceProvider"
+            ]
+        }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "config": {
+        "sort-packages": true,
+        "allow-plugins": {
+            "php-http/discovery": true
+        }
+    }
+}
