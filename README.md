@@ -25,6 +25,8 @@ Sister plugin: [Quick Sell](https://github.com/mr-glubschi/seat-quick-sell).
   opens the item's *Market Details* window in the game for the character who owns the order.
 - **Lock:** EVE allows a price change only 5 minutes after the order was placed or changed; the page shows
   how long is left, counted from the order's `issued` time.
+- **Summary:** sell and buy value left, undercut and open orders for exactly what the tables show; when a
+  filter hides orders, the figure for all orders of the chosen characters is shown below.
 - **Refresh:** asks SeAT to read the chosen characters' orders from ESI now, with SeAT's own jobs.
 
 ## Data and storage
@@ -69,6 +71,7 @@ Market Orders is installed like any other SeAT plugin (see SeAT's
 | --- | --- |
 | 0.1 | Skeleton: package, menu entry, permission, character overview, test to open the market window in game |
 | 0.2 | Order tables with competing prices, status, suggested price, copy and open in one click, refresh |
+| 0.2.1 | Summary figures follow the view and filters (characters, side, location, search, undercut), with the total for all orders below |
 | 0.3 | Relist fee, market depth, order slots, recent sales, link to Quick Sell |
 
 ## Development
