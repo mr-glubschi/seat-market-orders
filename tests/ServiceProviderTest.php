@@ -11,7 +11,14 @@ class ServiceProviderTest extends TestCase
 
     public function test_registers_the_routes_with_seat_middleware(): void
     {
-        foreach (['home' => ['market-orders', 'GET'], 'open-window' => ['market-orders/open-window', 'POST']] as $name => [$uri, $method]) {
+        $routes = [
+            'home' => ['market-orders', 'GET'],
+            'orders' => ['market-orders/orders', 'POST'],
+            'status' => ['market-orders/status', 'GET'],
+            'refresh' => ['market-orders/refresh', 'POST'],
+            'open-window' => ['market-orders/open-window', 'POST'],
+        ];
+        foreach ($routes as $name => [$uri, $method]) {
             $route = Route::getRoutes()->getByName('seatmarketorders::' . $name);
             $this->assertNotNull($route, $name);
             $this->assertSame($uri, $route->uri());
@@ -51,6 +58,6 @@ class ServiceProviderTest extends TestCase
     {
         $this->assertSame('Market Orders', trans('marketorders::menu.main'));
         $this->assertSame('View Market Orders', trans('marketorders::permissions.view_label'));
-        $this->assertSame('Open in game', trans('marketorders::global.open'));
+        $this->assertSame('Game', trans('marketorders::global.open'));
     }
 }
