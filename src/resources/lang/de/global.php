@@ -36,6 +36,7 @@ return [
     'buy_orders' => 'Buy Orders',
     'sell_note' => 'Bester Preis anderer Spieler am selben Ort; Orders all deiner Charaktere zählen nicht mit.',
     'buy_note' => 'Nur am selben Ort verglichen; Buy Orders anderswo, deren Reichweite bis hierher geht, sind nicht dabei.',
+    'sort_help' => 'Nach dieser Spalte sortieren; nochmals klicken kehrt die Reihenfolge um',
     'col_item' => 'Item',
     'col_character' => 'Charakter',
     'col_qty' => 'Menge',

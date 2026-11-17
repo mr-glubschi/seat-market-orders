@@ -36,6 +36,7 @@ return [
     'buy_orders' => 'Buy Orders',
     'sell_note' => 'Best price of other players at the same place; orders of all your characters are ignored.',
     'buy_note' => 'Compared at the same place only; buy orders elsewhere whose range reaches this place are not included.',
+    'sort_help' => 'Sort by this column; click again to reverse',
     'col_item' => 'Item',
     'col_character' => 'Character',
     'col_qty' => 'Quantity',

@@ -66,6 +66,7 @@
     tr.mo-tied > td:first-child { box-shadow: inset 3px 0 0 #fd7e14; }
     tr.mo-ahead > td:first-child { box-shadow: inset 3px 0 0 #28a745; }
     tr.mo-alone > td:first-child { box-shadow: inset 3px 0 0 #17a2b8; }
+    .mo-sort { white-space: nowrap; text-decoration: none !important; }
     .mo-toast { position: fixed; right: 1rem; bottom: 1rem; z-index: 1080; max-width: 28rem; }
   </style>
 @endpush
@@ -86,10 +87,47 @@
         chars: @json($selected),
         view: @json($view),
         location: '', search: '', onlyUndercut: false,
-        rows: [], loadedAt: 0
+        rows: [], loadedAt: 0,
+        // Column sort: null = default (undercut first, then by item name); dir 1 ascending, -1 descending.
+        sort: { key: null, dir: 1 }
       };
       var POLL_MS = 1500, MAX_WAIT_MS = 120000;
       var STATUS_ORDER = { undercut: 0, tied: 1, unknown: 2, alone: 3, ahead: 4 };
+      var SORT_KEY = 'glubschi.marketorders.sort';
+      // How each sortable column compares two rows. Empty values (no competitor, no suggestion) always go last.
+      var SORTS = {
+        col_item: function (r) { return r.type; },
+        col_character: function (r) { return r.character; },
+        col_qty: function (r) { return r.remain; },
+        col_price: function (r) { return r.price; },
+        col_best: function (r) { return r.diff_pct; },
+        col_status: function (r) { return STATUS_ORDER[r.status]; },
+        col_suggestion: function (r) { return r.suggestion; },
+        col_expires: function (r) { return r.expires; }
+      };
+      // The chosen sort is a per-browser convenience: remembered in localStorage when the browser allows it.
+      try {
+        var savedSort = JSON.parse(localStorage.getItem(SORT_KEY) || 'null');
+        if (savedSort && SORTS[savedSort.key] && (savedSort.dir === 1 || savedSort.dir === -1)) state.sort = savedSort;
+      } catch (e) { /* no storage: default sort */ }
+
+      function compareRows(a, b) {
+        if (!state.sort.key) {
+          return (STATUS_ORDER[a.status] - STATUS_ORDER[b.status]) || a.type.localeCompare(b.type);
+        }
+        var get = SORTS[state.sort.key], x = get(a), y = get(b);
+        var xe = x === null || x === undefined, ye = y === null || y === undefined;
+        if (xe || ye) return xe === ye ? a.type.localeCompare(b.type) : (xe ? 1 : -1);
+        var c = typeof x === 'string' ? x.localeCompare(y) : x - y;
+        return c * state.sort.dir || a.type.localeCompare(b.type);
+      }
+
+      function setSort(key) {
+        if (state.sort.key === key) state.sort = { key: key, dir: -state.sort.dir };
+        else state.sort = { key: key, dir: 1 };
+        try { localStorage.setItem(SORT_KEY, JSON.stringify(state.sort)); } catch (e) { /* ignore */ }
+        render();
+      }
 
       function tr(key, repl) {
         var s = t[key] || key;
@@ -216,9 +254,7 @@
             && (!state.location || String(r.location_id) === state.location)
             && (!q || r.type.toLowerCase().indexOf(q) >= 0)
             && (!state.onlyUndercut || r.status === 'undercut' || r.status === 'tied');
-        }).sort(function (a, b) {
-          return (STATUS_ORDER[a.status] - STATUS_ORDER[b.status]) || a.type.localeCompare(b.type);
-        });
+        }).sort(compareRows);
       }
 
       function statusBadge(r) {
@@ -356,7 +392,17 @@
           ['col_status', ''], ['col_suggestion', 'text-right'], ['col_expires', ''], ['', '']];
         cols.forEach(function (col) {
           if (col[0] === 'col_character' && !showChar) return;
-          hr.appendChild(el('th', col[1], col[0] ? t[col[0]] : ''));
+          var th = el('th', col[1]);
+          if (!col[0]) { hr.appendChild(th); return; }
+          var on = state.sort.key === col[0];
+          var b = el('button', 'btn btn-link btn-sm p-0 font-weight-bold text-reset mo-sort', t[col[0]]);
+          b.type = 'button';
+          b.title = t.sort_help;
+          b.appendChild(el('i', 'fas ml-1 ' + (on ? (state.sort.dir === 1 ? 'fa-sort-up' : 'fa-sort-down') : 'fa-sort text-muted')));
+          b.onclick = function () { setSort(col[0]); };
+          th.setAttribute('aria-sort', on ? (state.sort.dir === 1 ? 'ascending' : 'descending') : 'none');
+          th.appendChild(b);
+          hr.appendChild(th);
         });
         thead.appendChild(hr); tbl.appendChild(thead);
         var tb = el('tbody');
